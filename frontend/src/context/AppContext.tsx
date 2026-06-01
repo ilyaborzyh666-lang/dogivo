@@ -7,6 +7,7 @@ interface Dog {
   size: string
   gender: string
   notes: string
+  photo?: string
 }
 
 interface User {
@@ -14,6 +15,7 @@ interface User {
   email: string
   phone: string
   city: string
+  photo?: string
 }
 
 interface AppState {

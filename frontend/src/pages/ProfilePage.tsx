@@ -31,7 +31,7 @@ export default function ProfilePage() {
 
         {/* User card */}
         <Card className="flex items-center gap-4">
-          <Avatar name={user.name} size="xl" />
+          <Avatar src={user.photo} name={user.name} size="xl" />
           <div className="flex-1">
             <p className="font-display font-black text-xl text-gray-900">{user.name}</p>
             <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>

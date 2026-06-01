@@ -8,7 +8,10 @@ function DogsContent() {
   const { dog } = useApp()
   return (
     <Card className="flex items-center gap-4">
-      <span className="text-5xl">🐕</span>
+      {dog.photo
+        ? <img src={dog.photo} alt={dog.name} className="w-14 h-14 rounded-2xl object-cover" />
+        : <span className="text-5xl">🐕</span>
+      }
       <div className="flex-1">
         <p className="font-bold text-gray-900">{dog.name}</p>
         <p className="text-sm text-gray-400">{dog.breed} · {dog.age} שנים</p>

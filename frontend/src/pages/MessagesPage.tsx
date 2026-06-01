@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Card } from '../components/ui'
+import { Avatar, Card } from '../components/ui'
 import { BottomNav } from './BookingsPage'
+import { useApp } from '../context/AppContext'
 
 const conversations = [
   { id: 1, name: 'יונתן כהן', emoji: '👨', last: 'מחר אני מגיע ב-8:00 בדיוק!', time: '09:14', unread: 2 },
@@ -18,6 +19,7 @@ const demoMessages = [
 export default function MessagesPage() {
   const [open, setOpen] = useState<number | null>(null)
   const [input, setInput] = useState('')
+  const { user } = useApp()
 
   const conv = conversations.find(c => c.id === open)
 
@@ -67,7 +69,12 @@ export default function MessagesPage() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 pb-32">
             {demoMessages.map((m, i) => (
-              <div key={i} className={`flex ${m.from === 'me' ? 'justify-start' : 'justify-end'}`}>
+              <div key={i} className={`flex items-end gap-2 ${m.from === 'me' ? 'flex-row' : 'flex-row-reverse'}`}>
+                <Avatar
+                  src={m.from === 'me' ? user.photo : undefined}
+                  name={m.from === 'me' ? user.name : conv?.name}
+                  size="sm"
+                />
                 <div className={`max-w-xs px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'me'
                     ? 'bg-white border border-orange-100 text-gray-800'

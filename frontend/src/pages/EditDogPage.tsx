@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Input } from '../components/ui'
+import { Button, Input, PhotoPicker } from '../components/ui'
 import { useApp } from '../context/AppContext'
 
 const BREEDS = ['גולדן רטריבר', 'לברדור', 'פודל', 'בולדוג', 'הסקי', 'שיצו', 'מאלטז', 'ביגל', 'רועה גרמני', 'אחר']
@@ -20,9 +20,10 @@ export default function EditDogPage() {
   const [size, setSize] = useState(dog.size)
   const [gender, setGender] = useState(dog.gender)
   const [notes, setNotes] = useState(dog.notes)
+  const [photo, setPhoto] = useState(dog.photo)
 
   function save() {
-    setDog({ name, breed, age, size, gender, notes })
+    setDog({ name, breed, age, size, gender, notes, photo })
     navigate('/my-dogs')
   }
 
@@ -34,14 +35,16 @@ export default function EditDogPage() {
       </div>
 
       <div className="px-5 py-6 max-w-lg mx-auto space-y-5">
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-7xl">🐕</div>
-          <button className="text-brand-500 text-sm font-semibold">שנה תמונה</button>
-        </div>
+        <PhotoPicker
+          photo={photo}
+          fallback="🐕"
+          shape="rounded"
+          onChange={setPhoto}
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <Input label="שם הכלב" value={name} onChange={e => setName(e.target.value)} />
-          <Input label="גיל (שנים)" type="number" value={age} onChange={e => setAge(e.target.value)} />
+          <Input label="גיל (שנים)" type="number" value={age} min="0" max="10" onChange={e => { const v = Math.min(10, Math.max(0, Number(e.target.value))); setAge(String(v)) }} />
         </div>
 
         <div className="flex flex-col gap-1.5">
