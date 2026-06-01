@@ -9,11 +9,11 @@ const stats = [
 ]
 
 const menuItems = [
-  { icon: '🐶', label: 'הכלבים שלי', sub: 'מקס · גולדן רטריבר' },
-  { icon: '💳', label: 'אמצעי תשלום', sub: 'Visa •••• 4242' },
-  { icon: '🔔', label: 'התראות', sub: 'פעיל' },
-  { icon: '🔒', label: 'פרטיות ואבטחה', sub: '' },
-  { icon: '❓', label: 'עזרה ותמיכה', sub: '' },
+  { icon: '🐶', label: 'הכלבים שלי', sub: 'מקס · גולדן רטריבר', path: '/my-dogs' },
+  { icon: '💳', label: 'אמצעי תשלום', sub: 'Visa •••• 4242', path: '/payment' },
+  { icon: '🔔', label: 'התראות', sub: 'פעיל', path: '/notifications' },
+  { icon: '🔒', label: 'פרטיות ואבטחה', sub: '', path: '/security' },
+  { icon: '❓', label: 'עזרה ותמיכה', sub: '', path: '/help' },
 ]
 
 export default function ProfilePage() {
@@ -53,6 +53,7 @@ export default function ProfilePage() {
           {menuItems.map((item, i) => (
             <button
               key={item.label}
+              onClick={() => navigate(item.path)}
               className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-orange-50 active:bg-orange-100 transition-colors text-right ${
                 i < menuItems.length - 1 ? 'border-b border-orange-50' : ''
               }`}
