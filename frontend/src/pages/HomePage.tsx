@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Avatar, Badge, Card, Logo } from '../components/ui'
 
 const walkers = [
@@ -7,8 +8,10 @@ const walkers = [
 ]
 
 export default function HomePage() {
+  const navigate = useNavigate()
+
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-orange-50 pb-24">
 
       {/* Header */}
       <div className="bg-white border-b border-orange-100 px-5 py-4 flex items-center justify-between">
@@ -34,7 +37,10 @@ export default function HomePage() {
         </div>
 
         {/* Next walk banner */}
-        <div className="bg-brand-500 rounded-3xl p-5 text-white flex items-center justify-between shadow-lg shadow-orange-200">
+        <div
+          onClick={() => navigate('/tracking')}
+          className="bg-brand-500 rounded-3xl p-5 text-white flex items-center justify-between shadow-lg shadow-orange-200 cursor-pointer active:scale-95 transition-transform"
+        >
           <div>
             <p className="text-sm font-semibold opacity-80">הטיול הבא</p>
             <p className="font-display font-black text-xl mt-0.5">מחר בשעה 8:00</p>
@@ -50,7 +56,11 @@ export default function HomePage() {
           <h2 className="font-display font-bold text-lg text-gray-900 mb-3">מטיילים בקרבתך</h2>
           <div className="space-y-3">
             {walkers.map(w => (
-              <Card key={w.id} className="flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow">
+              <Card
+                key={w.id}
+                className="flex items-center gap-4 cursor-pointer hover:shadow-md active:scale-95 transition-all"
+                onClick={() => navigate(`/walker/${w.id}`)}
+              >
                 <div className="text-4xl">{w.emoji}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -80,12 +90,16 @@ export default function HomePage() {
       {/* Bottom nav */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 flex justify-around py-3 px-6">
         {[
-          { icon: '🏠', label: 'בית', active: true },
-          { icon: '📅', label: 'הזמנות', active: false },
-          { icon: '💬', label: 'הודעות', active: false },
-          { icon: '👤', label: 'פרופיל', active: false },
+          { icon: '🏠', label: 'בית', active: true, path: '/home' },
+          { icon: '📅', label: 'הזמנות', active: false, path: '/home' },
+          { icon: '💬', label: 'הודעות', active: false, path: '/home' },
+          { icon: '👤', label: 'פרופיל', active: false, path: '/home' },
         ].map(item => (
-          <button key={item.label} className="flex flex-col items-center gap-1">
+          <button
+            key={item.label}
+            onClick={() => navigate(item.path)}
+            className="flex flex-col items-center gap-1"
+          >
             <span className="text-2xl">{item.icon}</span>
             <span className={`text-xs font-semibold ${item.active ? 'text-brand-500' : 'text-gray-400'}`}>
               {item.label}
