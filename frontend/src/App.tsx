@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AppProvider } from './context/AppContext'
 import OnboardingPage from './pages/OnboardingPage'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
@@ -14,6 +15,7 @@ import EditDogPage from './pages/EditDogPage'
 
 export default function App() {
   return (
+    <AppProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<OnboardingPage />} />
@@ -35,5 +37,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
+    </AppProvider>
   )
 }

@@ -1,13 +1,21 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Button, Input } from '../components/ui'
+import { useApp } from '../context/AppContext'
 
 export default function EditProfilePage() {
   const navigate = useNavigate()
-  const [name, setName] = useState('ישראל ישראלי')
-  const [email, setEmail] = useState('israel@example.com')
-  const [phone, setPhone] = useState('050-1234567')
-  const [city, setCity] = useState('תל אביב')
+  const { user, setUser } = useApp()
+
+  const [name, setName] = useState(user.name)
+  const [email, setEmail] = useState(user.email)
+  const [phone, setPhone] = useState(user.phone)
+  const [city, setCity] = useState(user.city)
+
+  function save() {
+    setUser({ name, email, phone, city })
+    navigate('/profile')
+  }
 
   return (
     <div className="min-h-screen bg-orange-50 pb-10">
@@ -17,14 +25,11 @@ export default function EditProfilePage() {
       </div>
 
       <div className="px-5 py-6 max-w-lg mx-auto space-y-6">
-
-        {/* Avatar */}
         <div className="flex flex-col items-center gap-3">
           <Avatar name={name} size="xl" />
           <button className="text-brand-500 text-sm font-semibold">שנה תמונה</button>
         </div>
 
-        {/* Form */}
         <div className="space-y-4">
           <Input label="שם מלא" value={name} onChange={e => setName(e.target.value)} />
           <Input label="אימייל" type="email" value={email} onChange={e => setEmail(e.target.value)} />
@@ -32,10 +37,7 @@ export default function EditProfilePage() {
           <Input label="עיר" value={city} onChange={e => setCity(e.target.value)} />
         </div>
 
-        <Button fullWidth size="lg" onClick={() => navigate('/profile')}>
-          שמור שינויים
-        </Button>
-
+        <Button fullWidth size="lg" onClick={save}>שמור שינויים</Button>
       </div>
     </div>
   )

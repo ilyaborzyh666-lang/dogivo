@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input } from '../components/ui'
+import { useApp } from '../context/AppContext'
 
 const BREEDS = ['גולדן רטריבר', 'לברדור', 'פודל', 'בולדוג', 'הסקי', 'שיצו', 'מאלטז', 'ביגל', 'רועה גרמני', 'אחר']
 const SIZES = [
@@ -11,12 +12,19 @@ const SIZES = [
 
 export default function EditDogPage() {
   const navigate = useNavigate()
-  const [name, setName] = useState('מקס')
-  const [breed, setBreed] = useState('גולדן רטריבר')
-  const [age, setAge] = useState('3')
-  const [size, setSize] = useState('גדול')
-  const [gender, setGender] = useState('זכר')
-  const [notes, setNotes] = useState('')
+  const { dog, setDog } = useApp()
+
+  const [name, setName] = useState(dog.name)
+  const [breed, setBreed] = useState(dog.breed)
+  const [age, setAge] = useState(dog.age)
+  const [size, setSize] = useState(dog.size)
+  const [gender, setGender] = useState(dog.gender)
+  const [notes, setNotes] = useState(dog.notes)
+
+  function save() {
+    setDog({ name, breed, age, size, gender, notes })
+    navigate('/my-dogs')
+  }
 
   return (
     <div className="min-h-screen bg-orange-50 pb-10">
@@ -26,20 +34,16 @@ export default function EditDogPage() {
       </div>
 
       <div className="px-5 py-6 max-w-lg mx-auto space-y-5">
-
-        {/* Dog emoji */}
         <div className="flex flex-col items-center gap-2">
           <div className="text-7xl">🐕</div>
           <button className="text-brand-500 text-sm font-semibold">שנה תמונה</button>
         </div>
 
-        {/* Name + age */}
         <div className="grid grid-cols-2 gap-3">
           <Input label="שם הכלב" value={name} onChange={e => setName(e.target.value)} />
           <Input label="גיל (שנים)" type="number" value={age} onChange={e => setAge(e.target.value)} />
         </div>
 
-        {/* Breed */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-semibold text-gray-700">גזע</label>
           <select
@@ -51,7 +55,6 @@ export default function EditDogPage() {
           </select>
         </div>
 
-        {/* Size */}
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-2">גודל</p>
           <div className="grid grid-cols-3 gap-2">
@@ -73,7 +76,6 @@ export default function EditDogPage() {
           </div>
         </div>
 
-        {/* Gender */}
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-2">מין</p>
           <div className="grid grid-cols-2 gap-2">
@@ -93,7 +95,6 @@ export default function EditDogPage() {
           </div>
         </div>
 
-        {/* Notes */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-semibold text-gray-700">הערות למטיילים (אופציונלי)</label>
           <textarea
@@ -105,10 +106,7 @@ export default function EditDogPage() {
           />
         </div>
 
-        <Button fullWidth size="lg" onClick={() => navigate('/my-dogs')}>
-          שמור שינויים
-        </Button>
-
+        <Button fullWidth size="lg" onClick={save}>שמור שינויים</Button>
       </div>
     </div>
   )

@@ -1,16 +1,18 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Card } from '../components/ui'
 import { BottomNav } from './BookingsPage'
+import { useApp } from '../context/AppContext'
 
 function DogsContent() {
   const navigate = useNavigate()
+  const { dog } = useApp()
   return (
     <Card className="flex items-center gap-4">
       <span className="text-5xl">🐕</span>
       <div className="flex-1">
-        <p className="font-bold text-gray-900">מקס</p>
-        <p className="text-sm text-gray-400">גולדן רטריבר · 3 שנים</p>
-        <p className="text-xs text-brand-500 mt-1">זכר · 28 ק״ג</p>
+        <p className="font-bold text-gray-900">{dog.name}</p>
+        <p className="text-sm text-gray-400">{dog.breed} · {dog.age} שנים</p>
+        <p className="text-xs text-brand-500 mt-1">{dog.gender} · {dog.size}</p>
       </div>
       <button
         onClick={() => navigate('/edit-dog')}

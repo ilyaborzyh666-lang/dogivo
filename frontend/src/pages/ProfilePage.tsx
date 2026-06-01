@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Badge, Card } from '../components/ui'
 import { BottomNav } from './BookingsPage'
+import { useApp } from '../context/AppContext'
 
 const stats = [
   { label: 'טיולים', value: '12' },
@@ -18,6 +19,7 @@ const menuItems = [
 
 export default function ProfilePage() {
   const navigate = useNavigate()
+  const { user } = useApp()
 
   return (
     <div className="min-h-screen bg-orange-50 pb-24">
@@ -29,10 +31,10 @@ export default function ProfilePage() {
 
         {/* User card */}
         <Card className="flex items-center gap-4">
-          <Avatar name="ישראל ישראלי" size="xl" />
+          <Avatar name={user.name} size="xl" />
           <div className="flex-1">
-            <p className="font-display font-black text-xl text-gray-900">ישראל ישראלי</p>
-            <p className="text-sm text-gray-400 mt-0.5">israel@example.com</p>
+            <p className="font-display font-black text-xl text-gray-900">{user.name}</p>
+            <p className="text-sm text-gray-400 mt-0.5">{user.email}</p>
             <Badge className="mt-2">בעל כלב</Badge>
           </div>
           <button onClick={() => navigate('/edit-profile')} className="text-brand-500 text-sm font-semibold">עריכה</button>
