@@ -9,6 +9,8 @@ import BookingsPage from './pages/BookingsPage'
 import MessagesPage from './pages/MessagesPage'
 import ProfilePage from './pages/ProfilePage'
 import SimpleSettingsPage from './pages/SimpleSettingsPage'
+import EditProfilePage from './pages/EditProfilePage'
+import EditDogPage from './pages/EditDogPage'
 
 export default function App() {
   return (
@@ -23,7 +25,9 @@ export default function App() {
         <Route path="/bookings" element={<BookingsPage />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/my-dogs" element={<SimpleSettingsPage />} />
+        <Route path="/edit-dog" element={<EditDogPage />} />
         <Route path="/payment" element={<SimpleSettingsPage />} />
         <Route path="/notifications" element={<SimpleSettingsPage />} />
         <Route path="/security" element={<SimpleSettingsPage />} />

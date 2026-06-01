@@ -35,7 +35,7 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-400 mt-0.5">israel@example.com</p>
             <Badge className="mt-2">בעל כלב</Badge>
           </div>
-          <button className="text-brand-500 text-sm font-semibold">עריכה</button>
+          <button onClick={() => navigate('/edit-profile')} className="text-brand-500 text-sm font-semibold">עריכה</button>
         </Card>
 
         {/* Stats */}

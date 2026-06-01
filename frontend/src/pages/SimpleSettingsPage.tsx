@@ -2,19 +2,30 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { Card } from '../components/ui'
 import { BottomNav } from './BookingsPage'
 
+function DogsContent() {
+  const navigate = useNavigate()
+  return (
+    <Card className="flex items-center gap-4">
+      <span className="text-5xl">🐕</span>
+      <div className="flex-1">
+        <p className="font-bold text-gray-900">מקס</p>
+        <p className="text-sm text-gray-400">גולדן רטריבר · 3 שנים</p>
+        <p className="text-xs text-brand-500 mt-1">זכר · 28 ק״ג</p>
+      </div>
+      <button
+        onClick={() => navigate('/edit-dog')}
+        className="text-brand-500 text-sm font-semibold"
+      >
+        עריכה
+      </button>
+    </Card>
+  )
+}
+
 const config: Record<string, { title: string; icon: string; content: React.ReactNode }> = {
   '/my-dogs': {
     title: 'הכלבים שלי', icon: '🐶',
-    content: (
-      <Card className="flex items-center gap-4">
-        <span className="text-5xl">🐕</span>
-        <div>
-          <p className="font-bold text-gray-900">מקס</p>
-          <p className="text-sm text-gray-400">גולדן רטריבר · 3 שנים</p>
-          <p className="text-xs text-brand-500 mt-1">זכר · 28 ק״ג</p>
-        </div>
-      </Card>
-    ),
+    content: <DogsContent />,
   },
   '/payment': {
     title: 'אמצעי תשלום', icon: '💳',
