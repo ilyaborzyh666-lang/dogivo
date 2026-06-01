@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Badge, Card, Logo } from '../components/ui'
+import { BottomNav } from './BookingsPage'
 
 const walkers = [
   { id: 1, name: 'יונתן כהן', area: 'תל אביב', price: 45, rating: 4.9, reviews: 38, available: true, emoji: '👨' },
@@ -87,26 +88,7 @@ export default function HomePage() {
 
       </div>
 
-      {/* Bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 flex justify-around py-3 px-6">
-        {[
-          { icon: '🏠', label: 'בית', active: true, path: '/home' },
-          { icon: '📅', label: 'הזמנות', active: false, path: '/home' },
-          { icon: '💬', label: 'הודעות', active: false, path: '/home' },
-          { icon: '👤', label: 'פרופיל', active: false, path: '/home' },
-        ].map(item => (
-          <button
-            key={item.label}
-            onClick={() => navigate(item.path)}
-            className="flex flex-col items-center gap-1"
-          >
-            <span className="text-2xl">{item.icon}</span>
-            <span className={`text-xs font-semibold ${item.active ? 'text-brand-500' : 'text-gray-400'}`}>
-              {item.label}
-            </span>
-          </button>
-        ))}
-      </div>
+      <BottomNav active="home" />
 
     </div>
   )
