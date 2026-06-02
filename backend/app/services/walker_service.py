@@ -50,7 +50,9 @@ async def search_walkers(
     if max_price:
         query = query.where(WalkerProfile.price_per_hour <= max_price)
 
-    query = query.order_by(WalkerProfile.rating.desc()).limit(limit).offset(offset)
+    if not (lat and lon):
+        query = query.order_by(WalkerProfile.rating.desc())
+    query = query.limit(limit).offset(offset)
     rows = await db.execute(query)
 
     results = []
@@ -71,6 +73,10 @@ async def search_walkers(
             is_available=profile.is_available,
             distance_km=round(distance, 1) if distance is not None else None,
         ))
+
+    if lat and lon:
+        results.sort(key=lambda r: (r.distance_km if r.distance_km is not None else 9999, -r.rating))
+
     return results
 
 

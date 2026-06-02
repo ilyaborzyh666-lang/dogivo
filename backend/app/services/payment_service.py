@@ -12,6 +12,18 @@ settings = get_settings()
 
 async def create_payment_intent(db: AsyncSession, booking: Booking) -> CreatePaymentIntentResponse:
     stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    existing = await db.execute(
+        select(Payment).where(Payment.booking_id == booking.id)
+    )
+    payment = existing.scalar_one_or_none()
+    if payment:
+        intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent_id)
+        return CreatePaymentIntentResponse(
+            client_secret=intent.client_secret,
+            payment_intent_id=intent.id,
+        )
+
     amount_cents = int(float(booking.total_price) * 100)
 
     intent = stripe.PaymentIntent.create(

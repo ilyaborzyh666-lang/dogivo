@@ -33,6 +33,17 @@ async def create_booking(db: AsyncSession, owner_id: int, data: BookingCreate) -
     if not walker_profile:
         raise ValueError("Walker profile not found")
 
+    overlap = await db.execute(
+        select(Booking).where(
+            Booking.walker_id == data.walker_id,
+            Booking.status.not_in([BookingStatus.CANCELLED]),
+            Booking.scheduled_start < data.scheduled_end,
+            Booking.scheduled_end > data.scheduled_start,
+        )
+    )
+    if overlap.scalar_one_or_none():
+        raise ValueError("Walker already has a booking in this time slot")
+
     duration_hours = (data.scheduled_end - data.scheduled_start).total_seconds() / 3600
     total_price = float(walker_profile.price_per_hour) * duration_hours
 
