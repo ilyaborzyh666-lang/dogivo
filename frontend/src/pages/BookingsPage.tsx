@@ -1,21 +1,37 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { Badge, Card } from '../components/ui'
-
-const bookings = [
-  { id: 1, walker: 'יונתן כהן', emoji: '👨', date: '2026-06-02', time: '08:00', duration: '45 דק׳', price: 45, status: 'upcoming' },
-  { id: 2, walker: 'מיכל לוי', emoji: '👩', date: '2026-05-28', time: '17:00', duration: '60 דק׳', price: 45, status: 'completed' },
-  { id: 3, walker: 'יונתן כהן', emoji: '👨', date: '2026-05-20', time: '08:00', duration: '45 דק׳', price: 45, status: 'completed' },
-  { id: 4, walker: 'אורי גולדברג', emoji: '🧑', date: '2026-05-10', time: '09:00', duration: '30 דק׳', price: 25, status: 'cancelled' },
-]
+import { api, type Booking } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 
 const statusMap: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'default' }> = {
-  upcoming: { label: 'קרוב', variant: 'warning' },
-  completed: { label: 'הושלם', variant: 'success' },
-  cancelled: { label: 'בוטל', variant: 'danger' },
+  pending:     { label: 'ממתין', variant: 'warning' },
+  confirmed:   { label: 'קרוב', variant: 'warning' },
+  in_progress: { label: 'בטיול', variant: 'success' },
+  completed:   { label: 'הושלם', variant: 'success' },
+  cancelled:   { label: 'בוטל', variant: 'danger' },
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+function formatTime(iso: string) {
+  return new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
 }
 
 export default function BookingsPage() {
   const navigate = useNavigate()
+  const { backendToken } = useAuth()
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!backendToken) return
+    api.getBookings()
+      .then(setBookings)
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [backendToken])
 
   return (
     <div className="min-h-screen bg-orange-50 pb-24">
@@ -24,30 +40,58 @@ export default function BookingsPage() {
       </div>
 
       <div className="px-5 py-5 space-y-3 max-w-lg mx-auto">
-        {bookings.map(b => (
-          <Card
-            key={b.id}
-            className="cursor-pointer hover:shadow-md active:scale-95 transition-all"
-            onClick={() => b.status === 'upcoming' ? navigate('/tracking') : null}
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-4xl">{b.emoji}</div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-sm text-gray-900">{b.walker}</p>
-                  <Badge variant={statusMap[b.status].variant}>{statusMap[b.status].label}</Badge>
+        {loading ? (
+          [1, 2, 3].map(i => <div key={i} className="bg-white rounded-2xl h-20 animate-pulse" />)
+        ) : bookings.length === 0 ? (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-5xl mb-3">📅</p>
+            <p className="font-semibold">אין הזמנות עדיין</p>
+            <button
+              onClick={() => navigate('/home')}
+              className="mt-4 text-brand-500 text-sm font-semibold"
+            >
+              מצא מטייל →
+            </button>
+          </div>
+        ) : (
+          bookings.map(b => {
+            const s = statusMap[b.status] ?? { label: b.status, variant: 'default' as const }
+            const isActive = b.status === 'in_progress'
+            const isUpcoming = b.status === 'pending' || b.status === 'confirmed'
+            return (
+              <Card
+                key={b.id}
+                className={`cursor-pointer hover:shadow-md active:scale-95 transition-all ${isActive ? 'border-brand-300 bg-brand-50' : ''}`}
+                onClick={() => isActive ? navigate('/tracking') : undefined}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-4xl">🐕</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm text-gray-900">{b.dog_name}</p>
+                      <Badge variant={s.variant}>{s.label}</Badge>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {formatDate(b.scheduled_start)} · {formatTime(b.scheduled_start)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-brand-500 text-sm">₪{Number(b.total_price).toFixed(0)}</p>
+                    {isActive && <p className="text-xs text-brand-400 mt-0.5">עקוב ›</p>}
+                    {isUpcoming && (
+                      <button
+                        onClick={e => { e.stopPropagation(); api.updateBookingStatus(b.id, 'cancelled').then(() => setBookings(prev => prev.map(x => x.id === b.id ? { ...x, status: 'cancelled' } : x))) }}
+                        className="text-xs text-red-400 mt-0.5"
+                      >
+                        ביטול
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">{b.date} · {b.time} · {b.duration}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-brand-500 text-sm">₪{b.price}</p>
-                {b.status === 'upcoming' && (
-                  <p className="text-xs text-brand-400 mt-0.5">עקוב ›</p>
-                )}
-              </div>
-            </div>
-          </Card>
-        ))}
+              </Card>
+            )
+          })
+        )}
       </div>
 
       <BottomNav active="bookings" />
@@ -55,7 +99,6 @@ export default function BookingsPage() {
   )
 }
 
-// re-exported below
 export function BottomNav({ active }: { active: string }) {
   const navigate = useNavigate()
   const items = [

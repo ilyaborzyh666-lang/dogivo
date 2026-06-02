@@ -18,3 +18,7 @@ class RefreshRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
+
+
+class FirebaseAuthRequest(BaseModel):
+    id_token: str

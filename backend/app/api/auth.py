@@ -26,7 +26,7 @@ from app.core.token_store import (
     blacklist_access_token,
 )
 from app.models.user import User
-from app.schemas.auth import LoginRequest, TokenResponse, RefreshRequest, GoogleAuthRequest
+from app.schemas.auth import LoginRequest, TokenResponse, RefreshRequest, GoogleAuthRequest, FirebaseAuthRequest
 from app.schemas.user import UserCreate, UserOut
 from app.services.user_service import get_user_by_email, get_user_by_google_id, create_user, create_oauth_user
 
@@ -132,6 +132,39 @@ async def google_auth(
             user = await create_oauth_user(db_session, email=email, full_name=full_name, google_id=google_id, avatar_url=avatar_url)
         elif not user.google_id:
             user.google_id = google_id
+        await db_session.commit()
+        user_id = user.id
+
+    return await _issue_tokens(redis, user_id)
+
+
+@router.post("/firebase", response_model=TokenResponse)
+async def firebase_auth(
+    data: FirebaseAuthRequest,
+    db: AsyncSession = Depends(get_db),
+    redis: aioredis.Redis = Depends(get_redis),
+):
+    try:
+        from app.core.firebase_admin import verify_firebase_token
+        decoded = verify_firebase_token(data.id_token)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Firebase token")
+
+    firebase_uid = decoded["uid"]
+    email = decoded.get("email", "")
+    full_name = decoded.get("name", email)
+    avatar_url = decoded.get("picture")
+
+    from app.db.session import AsyncSessionLocal
+    async with AsyncSessionLocal() as db_session:
+        user = await get_user_by_google_id(db_session, firebase_uid) or await get_user_by_email(db_session, email)
+        if not user:
+            user = await create_oauth_user(
+                db_session, email=email, full_name=full_name,
+                google_id=firebase_uid, avatar_url=avatar_url,
+            )
+        elif not user.google_id:
+            user.google_id = firebase_uid
         await db_session.commit()
         user_id = user.id
 
