@@ -12,7 +12,7 @@ const SIZES = [
 
 export default function EditDogPage() {
   const navigate = useNavigate()
-  const { dog, setDog } = useApp()
+  const { dog, saveDog } = useApp()
 
   const [name, setName] = useState(dog.name)
   const [breed, setBreed] = useState(dog.breed)
@@ -21,10 +21,12 @@ export default function EditDogPage() {
   const [gender, setGender] = useState(dog.gender)
   const [notes, setNotes] = useState(dog.notes)
   const [photo, setPhoto] = useState(dog.photo)
+  const [saved, setSaved] = useState(false)
 
-  function save() {
-    setDog({ name, breed, age, size, gender, notes, photo })
-    navigate('/my-dogs')
+  async function save() {
+    await saveDog({ name, breed, age, size, gender, notes, photo })
+    setSaved(true)
+    setTimeout(() => navigate('/my-dogs'), 1200)
   }
 
   return (
@@ -110,6 +112,12 @@ export default function EditDogPage() {
         </div>
 
         <Button fullWidth size="lg" onClick={save}>שמור שינויים</Button>
+
+        {saved && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-lg">
+            עודכן בהצלחה ✓
+          </div>
+        )}
       </div>
     </div>
   )

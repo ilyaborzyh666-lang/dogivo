@@ -7,7 +7,21 @@
       "Bash(gh auth *)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git config *)",
+      "Bash(gh repo *)",
+      "Bash(python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000)",
+      "Bash(curl -s http://localhost:8000/docs)",
+      "Bash(pip install *)",
+      "Bash(pip show *)",
+      "Bash(docker compose *)",
+      "PowerShell(docker compose up -d db redis 2>&1)",
+      "PowerShell(Get-Command docker -ErrorAction SilentlyContinue; Get-Command \"docker-compose\" -ErrorAction SilentlyContinue; \\(Get-Command docker\\).Source 2>&1)",
+      "PowerShell(Get-Command psql -ErrorAction SilentlyContinue)",
+      "PowerShell(npm create vite@latest \"C:\\\\Users\\\\ilyab\\\\OneDrive\\\\Desktop\\\\Dogivo\\\\frontend\" -- --template react-ts 2>&1)",
+      "PowerShell(Get-Process -Name node -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "Bash(git push *)"
     ]
   }
 }

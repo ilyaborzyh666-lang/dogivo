@@ -1,4 +1,7 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { useAuth } from './AuthContext'
 
 interface Dog {
   name: string
@@ -10,7 +13,7 @@ interface Dog {
   photo?: string
 }
 
-interface User {
+interface UserProfile {
   name: string
   email: string
   phone: string
@@ -19,33 +22,66 @@ interface User {
 }
 
 interface AppState {
-  user: User
+  user: UserProfile
   dog: Dog
-  setUser: (u: User) => void
+  setUser: (u: UserProfile) => void
   setDog: (d: Dog) => void
+  saveUser: (u: UserProfile) => Promise<void>
+  saveDog: (d: Dog) => Promise<void>
 }
+
+const defaultUser: UserProfile = { name: '', email: '', phone: '', city: '' }
+const defaultDog: Dog = { name: '', breed: '', age: '', size: '', gender: '', notes: '' }
 
 const AppContext = createContext<AppState | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User>({
-    name: 'ישראל ישראלי',
-    email: 'israel@example.com',
-    phone: '050-1234567',
-    city: 'תל אביב',
-  })
+  const { currentUser } = useAuth()
+  const [user, setUser] = useState<UserProfile>(defaultUser)
+  const [dog, setDog] = useState<Dog>(defaultDog)
 
-  const [dog, setDog] = useState<Dog>({
-    name: 'מקס',
-    breed: 'גולדן רטריבר',
-    age: '3',
-    size: 'גדול',
-    gender: 'זכר',
-    notes: '',
-  })
+  useEffect(() => {
+    if (!currentUser) {
+      setUser(defaultUser)
+      setDog(defaultDog)
+      return
+    }
+    const uid = currentUser.uid
+    getDoc(doc(db, 'users', uid)).then(snap => {
+      if (snap.exists()) setUser(snap.data() as UserProfile)
+    })
+    const dogRef = doc(db, 'users', uid, 'dogs', 'primary')
+    getDoc(dogRef).then(snap => {
+      if (snap.exists()) {
+        setDog(snap.data() as Dog)
+      } else {
+        const initial = { name: '', breed: 'גולדן רטריבר', age: '1', size: 'בינוני', gender: 'זכר', notes: '' }
+        setDoc(dogRef, initial)
+        setDog(initial)
+      }
+    })
+  }, [currentUser])
+
+  function stripUndefined<T extends object>(obj: T): Partial<T> {
+    return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>
+  }
+
+  async function saveUser(u: UserProfile) {
+    setUser(u)
+    if (currentUser) {
+      await setDoc(doc(db, 'users', currentUser.uid), stripUndefined(u), { merge: true })
+    }
+  }
+
+  async function saveDog(d: Dog) {
+    setDog(d)
+    if (currentUser) {
+      await setDoc(doc(db, 'users', currentUser.uid, 'dogs', 'primary'), stripUndefined(d))
+    }
+  }
 
   return (
-    <AppContext.Provider value={{ user, dog, setUser, setDog }}>
+    <AppContext.Provider value={{ user, dog, setUser, setDog, saveUser, saveDog }}>
       {children}
     </AppContext.Provider>
   )

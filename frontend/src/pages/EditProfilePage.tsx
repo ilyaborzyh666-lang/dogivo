@@ -5,17 +5,19 @@ import { useApp } from '../context/AppContext'
 
 export default function EditProfilePage() {
   const navigate = useNavigate()
-  const { user, setUser } = useApp()
+  const { user, saveUser } = useApp()
 
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
   const [phone, setPhone] = useState(user.phone)
   const [city, setCity] = useState(user.city)
   const [photo, setPhoto] = useState(user.photo)
+  const [saved, setSaved] = useState(false)
 
-  function save() {
-    setUser({ name, email, phone, city, photo })
-    navigate('/profile')
+  async function save() {
+    await saveUser({ name, email, phone, city, photo })
+    setSaved(true)
+    setTimeout(() => navigate('/profile'), 1200)
   }
 
   return (
@@ -40,6 +42,12 @@ export default function EditProfilePage() {
         </div>
 
         <Button fullWidth size="lg" onClick={save}>שמור שינויים</Button>
+
+        {saved && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-lg">
+            עודכן בהצלחה ✓
+          </div>
+        )}
       </div>
     </div>
   )
