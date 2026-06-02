@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from './AuthContext'

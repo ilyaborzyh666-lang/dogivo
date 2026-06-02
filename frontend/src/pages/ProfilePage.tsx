@@ -15,6 +15,7 @@ const menuItems = [
   { icon: '🔔', label: 'התראות', sub: 'פעיל', path: '/notifications' },
   { icon: '🔒', label: 'פרטיות ואבטחה', sub: '', path: '/security' },
   { icon: '❓', label: 'עזרה ותמיכה', sub: '', path: '/help' },
+  { icon: 'ℹ️', label: 'אודות Dogivo', sub: 'גרסה 1.0.0', path: '/about' },
 ]
 
 export default function ProfilePage() {
