@@ -21,7 +21,12 @@ app = FastAPI(title="Dogivo API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://dogivo-cacc9.web.app",
+        "https://dogivo-cacc9.firebaseapp.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
