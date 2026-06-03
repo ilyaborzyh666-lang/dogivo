@@ -262,7 +262,7 @@ export function WalkerBottomNav({ active }: { active: string }) {
   const items = [
     { icon: '🏠', label: 'דשבורד', key: 'home', path: '/walker-dashboard' },
     { icon: '💬', label: 'הודעות', key: 'messages', path: '/messages' },
-    { icon: '👤', label: 'פרופיל', key: 'profile', path: '/profile' },
+    { icon: '👤', label: 'פרופיל', key: 'profile', path: '/walker-profile' },
   ]
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 flex justify-around py-3 px-6">

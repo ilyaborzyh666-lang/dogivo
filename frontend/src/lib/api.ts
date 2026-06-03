@@ -71,7 +71,7 @@ export const api = {
   getMyWalkerProfile: () =>
     request<WalkerProfile>('/walkers/me'),
 
-  updateWalkerProfile: (data: Partial<{ bio: string; price_per_hour: number; city: string; is_available: boolean; years_experience: number }>) =>
+  updateWalkerProfile: (data: Partial<{ bio: string; price_per_hour: number; city: string; is_available: boolean; years_experience: number; latitude: number; longitude: number }>) =>
     request<WalkerProfile>('/walkers/me', { method: 'PATCH', body: JSON.stringify(data) }),
 
   createWalkerProfile: (data: Partial<{ bio: string; price_per_hour: number; city: string; is_available: boolean; years_experience: number }>) =>
