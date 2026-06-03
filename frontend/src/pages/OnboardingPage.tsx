@@ -47,12 +47,6 @@ export default function OnboardingPage() {
           <span className="text-xl opacity-40">›</span>
         </button>
 
-        <p className="text-center text-xs text-gray-400 pt-2">
-          כבר יש לך חשבון?{' '}
-          <button onClick={() => navigate('/login')} className="text-brand-500 font-semibold underline-offset-2 hover:underline">
-            התחבר
-          </button>
-        </p>
       </div>
 
     </div>
