@@ -1,17 +1,14 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { Avatar, Badge, Card } from '../components/ui'
 import { BottomNav } from './BookingsPage'
 import { useApp } from '../context/AppContext'
-
-const stats = [
-  { label: 'טיולים', value: '12' },
-  { label: 'כלבים', value: '1' },
-  { label: 'מטיילים', value: '3' },
-]
+import { useAuth } from '../context/AuthContext'
+import { api } from '../lib/api'
 
 const menuItems = [
-  { icon: '🐶', label: 'הכלבים שלי', sub: 'מקס · גולדן רטריבר', path: '/my-dogs' },
-  { icon: '💳', label: 'אמצעי תשלום', sub: 'Visa •••• 4242', path: '/payment' },
+  { icon: '🐶', label: 'הכלבים שלי', sub: '', path: '/my-dogs' },
+  { icon: '💳', label: 'אמצעי תשלום', sub: '', path: '/payment' },
   { icon: '🔔', label: 'התראות', sub: 'פעיל', path: '/notifications' },
   { icon: '🔒', label: 'פרטיות ואבטחה', sub: '', path: '/security' },
   { icon: '❓', label: 'עזרה ותמיכה', sub: '', path: '/help' },
@@ -20,7 +17,27 @@ const menuItems = [
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const { user } = useApp()
+  const { user, dog } = useApp()
+  const { logout, backendToken } = useAuth()
+  const [bookingCount, setBookingCount] = useState(0)
+
+  useEffect(() => {
+    if (!backendToken) return
+    api.getBookings()
+      .then(b => setBookingCount(b.filter(x => x.status === 'completed').length))
+      .catch(() => {})
+  }, [backendToken])
+
+  const stats = [
+    { label: 'טיולים', value: String(bookingCount) },
+    { label: 'כלבים', value: dog.name ? '1' : '0' },
+    { label: 'מטיילים', value: '0' },
+  ]
+
+  async function handleLogout() {
+    await logout()
+    navigate('/')
+  }
 
   return (
     <div className="min-h-screen bg-orange-50 pb-24">
@@ -73,7 +90,7 @@ export default function ProfilePage() {
 
         {/* Logout */}
         <button
-          onClick={() => navigate('/')}
+          onClick={handleLogout}
           className="w-full bg-white border border-red-100 text-red-500 font-bold rounded-2xl py-3.5 text-sm hover:bg-red-50 transition-colors"
         >
           התנתק
