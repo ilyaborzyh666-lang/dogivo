@@ -15,6 +15,7 @@ import EditProfilePage from './pages/EditProfilePage'
 import EditDogPage from './pages/EditDogPage'
 import AboutPage from './pages/AboutPage'
 import WalkerDashboardPage from './pages/WalkerDashboardPage'
+import WalkerSetupPage from './pages/WalkerSetupPage'
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/help" element={<SimpleSettingsPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/walker-dashboard" element={<WalkerDashboardPage />} />
+        <Route path="/walker-setup" element={<WalkerSetupPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
