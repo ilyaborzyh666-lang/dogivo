@@ -32,7 +32,7 @@ function ReviewModal({ bookingId, onClose, onDone }: { bookingId: number; onClos
       await api.leaveReview(bookingId, rating, comment)
       onDone()
     } catch (e: any) {
-      setError(e.message ?? 'שגיאה בשליחת הביקורת')
+      setError(typeof e?.message === 'string' ? e.message : 'שגיאה בשליחת הביקורת')
     } finally {
       setLoading(false)
     }
