@@ -81,6 +81,7 @@ async def leave_review(
     db: AsyncSession = Depends(get_db),
 ):
     from app.models.review import Review
+    from sqlalchemy import select
 
     booking = await get_booking(db, booking_id)
     if not booking:
@@ -89,7 +90,9 @@ async def leave_review(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the owner can leave a review")
     if booking.status != BookingStatus.COMPLETED:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Can only review completed bookings")
-    if booking.review:
+
+    existing_review = await db.execute(select(Review).where(Review.booking_id == booking_id))
+    if existing_review.scalar_one_or_none():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Review already exists")
 
     review = Review(
