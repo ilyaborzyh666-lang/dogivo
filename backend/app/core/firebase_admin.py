@@ -1,21 +1,30 @@
-import firebase_admin
-from firebase_admin import credentials, auth as firebase_auth
-from functools import lru_cache
+import httpx
+from jose import jwt, JWTError
 from app.core.config import get_settings
 
+GOOGLE_CERTS_URL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+FIREBASE_ISSUER_PREFIX = "https://securetoken.google.com/"
 
-@lru_cache
-def get_firebase_app():
+
+async def verify_firebase_token(id_token: str) -> dict:
     settings = get_settings()
-    if not firebase_admin._apps:
-        if settings.FIREBASE_SERVICE_ACCOUNT_PATH:
-            cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT_PATH)
-        else:
-            cred = credentials.ApplicationDefault()
-        firebase_admin.initialize_app(cred)
-    return firebase_admin.get_app()
+    project_id = "dogivo-cacc9"
 
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(GOOGLE_CERTS_URL)
+        certs = resp.json()
 
-def verify_firebase_token(id_token: str) -> dict:
-    get_firebase_app()
-    return firebase_auth.verify_id_token(id_token)
+    header = jwt.get_unverified_header(id_token)
+    kid = header.get("kid")
+    if not kid or kid not in certs:
+        raise ValueError("Invalid token: unknown kid")
+
+    public_key = certs[kid]
+    payload = jwt.decode(
+        id_token,
+        public_key,
+        algorithms=["RS256"],
+        audience=project_id,
+        issuer=f"{FIREBASE_ISSUER_PREFIX}{project_id}",
+    )
+    return payload

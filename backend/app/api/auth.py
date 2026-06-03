@@ -146,7 +146,7 @@ async def firebase_auth(
 ):
     try:
         from app.core.firebase_admin import verify_firebase_token
-        decoded = verify_firebase_token(data.id_token)
+        decoded = await verify_firebase_token(data.id_token)
     except Exception:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Firebase token")
 
