@@ -66,6 +66,19 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ rating, comment }),
     }),
+
+  // Walker
+  getMyWalkerProfile: () =>
+    request<WalkerProfile>('/walkers/me'),
+
+  updateWalkerProfile: (data: Partial<{ bio: string; price_per_hour: number; city: string; is_available: boolean; years_experience: number }>) =>
+    request<WalkerProfile>('/walkers/me', { method: 'PATCH', body: JSON.stringify(data) }),
+
+  createWalkerProfile: (data: Partial<{ bio: string; price_per_hour: number; city: string; is_available: boolean }>) =>
+    request<WalkerProfile>('/walkers/me', { method: 'POST', body: JSON.stringify(data) }),
+
+  getWalkerBookings: () =>
+    request<Booking[]>('/bookings/?as_walker=true'),
 }
 
 // Types

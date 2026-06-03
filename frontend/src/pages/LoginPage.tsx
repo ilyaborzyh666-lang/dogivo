@@ -25,7 +25,7 @@ export default function LoginPage() {
       } else {
         await register(email, password, name)
       }
-      navigate('/home')
+      navigate(role === 'walker' ? '/walker-dashboard' : '/home')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'שגיאה בהתחברות'
       if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
@@ -47,7 +47,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await loginWithGoogle()
-      navigate('/home')
+      navigate(role === 'walker' ? '/walker-dashboard' : '/home')
     } catch {
       setError('שגיאה בהתחברות עם Google')
     } finally {
