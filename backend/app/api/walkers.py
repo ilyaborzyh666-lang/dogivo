@@ -27,15 +27,12 @@ async def search(
     return await search_walkers(db, city=city, lat=lat, lon=lon, max_price=max_price, limit=limit, offset=offset)
 
 
-@router.get("/me", response_model=WalkerProfileOut)
+@router.get("/me", response_model=WalkerProfileOut | None)
 async def get_my_profile(
-    current_user: User = Depends(require_walker),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    profile = await get_walker_profile(db, current_user.id)
-    if not profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Walker profile not found")
-    return profile
+    return await get_walker_profile(db, current_user.id)
 
 
 @router.post("/me", response_model=WalkerProfileOut, status_code=status.HTTP_201_CREATED)
@@ -54,7 +51,7 @@ async def create_my_profile(
 @router.patch("/me", response_model=WalkerProfileOut)
 async def update_my_profile(
     data: WalkerProfileUpdate,
-    current_user: User = Depends(require_walker),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     profile = await get_walker_profile(db, current_user.id)
