@@ -36,7 +36,7 @@ export default function WalkerProfilePage() {
           <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center text-4xl shrink-0 overflow-hidden">
             {walker.avatar_url
               ? <img src={walker.avatar_url} className="w-full h-full object-cover" />
-              : <span>{walker.full_name[0]}</span>
+              : <span>{(walker.full_name || '?')[0]}</span>
             }
           </div>
           <div>
