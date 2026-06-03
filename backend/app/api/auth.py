@@ -150,7 +150,7 @@ async def firebase_auth(
     except Exception:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Firebase token")
 
-    firebase_uid = decoded["uid"]
+    firebase_uid = decoded.get("uid") or decoded.get("sub") or decoded.get("user_id", "")
     email = decoded.get("email", "")
     full_name = decoded.get("name", email)
     avatar_url = decoded.get("picture")
