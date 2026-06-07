@@ -52,6 +52,9 @@ export const api = {
   getBookings: () =>
     request<Booking[]>('/bookings/'),
 
+  getBooking: (bookingId: number) =>
+    request<Booking>(`/bookings/${bookingId}`),
+
   createBooking: (data: CreateBookingData) =>
     request<Booking>('/bookings/', { method: 'POST', body: JSON.stringify(data) }),
 
@@ -96,9 +99,20 @@ export interface WalkerResult {
   distance_km: number | null
 }
 
+export interface WalkerReview {
+  id: number
+  reviewer_id: number
+  rating: number
+  comment: string | null
+  created_at: string
+}
+
 export interface WalkerProfile extends WalkerResult {
   years_experience: number
+  latitude: number | null
+  longitude: number | null
   user: { id: number; full_name: string; email: string; avatar_url: string | null }
+  reviews: WalkerReview[]
 }
 
 export interface Booking {
@@ -115,6 +129,7 @@ export interface Booking {
   notes: string | null
   total_price: number
   created_at: string
+  has_review: boolean
 }
 
 export interface CreateBookingData {

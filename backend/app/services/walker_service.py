@@ -9,10 +9,11 @@ from app.schemas.walker import WalkerProfileUpdate, WalkerSearchResult
 
 
 async def get_walker_profile(db: AsyncSession, user_id: int) -> WalkerProfile | None:
+    from app.models.review import Review
     result = await db.execute(
         select(WalkerProfile)
         .where(WalkerProfile.user_id == user_id)
-        .options(selectinload(WalkerProfile.user))
+        .options(selectinload(WalkerProfile.user), selectinload(WalkerProfile.reviews))
     )
     return result.scalar_one_or_none()
 

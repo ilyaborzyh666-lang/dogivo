@@ -96,12 +96,27 @@ export default function WalkerProfilePage() {
           </div>
         </Card>
 
-        {/* Reviews placeholder */}
-        {walker.total_reviews === 0 && (
-          <Card>
-            <p className="text-sm text-gray-400 text-center py-2">אין ביקורות עדיין</p>
-          </Card>
-        )}
+        {/* Reviews */}
+        <div>
+          <h2 className="font-display font-bold text-lg text-gray-900 mb-3">ביקורות</h2>
+          {walker.reviews.length === 0 ? (
+            <Card>
+              <p className="text-sm text-gray-400 text-center py-2">אין ביקורות עדיין</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {walker.reviews.map(r => (
+                <Card key={r.id}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-yellow-400 text-sm">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
+                    <span className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('he-IL')}</span>
+                  </div>
+                  {r.comment && <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>}
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
       </div>
 

@@ -24,3 +24,9 @@ class WalkerProfile(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     user: Mapped["User"] = relationship(back_populates="walker_profile")
+    reviews: Mapped[list["Review"]] = relationship(
+        "Review",
+        primaryjoin="WalkerProfile.user_id == foreign(Review.walker_id)",
+        viewonly=True,
+        order_by="Review.created_at.desc()",
+    )

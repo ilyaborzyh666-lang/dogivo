@@ -38,5 +38,16 @@ class BookingOut(BaseModel):
     notes: str | None
     total_price: float
     created_at: datetime
+    has_review: bool = False
 
     model_config = {"from_attributes": True}
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_has_review(cls, data):
+        if not isinstance(data, dict) and hasattr(data, "review"):
+            return {
+                **{c.key: getattr(data, c.key) for c in data.__table__.columns},
+                "has_review": data.review is not None,
+            }
+        return data

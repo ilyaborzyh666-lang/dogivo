@@ -10,7 +10,11 @@ from app.schemas.booking import BookingCreate
 
 
 async def get_booking(db: AsyncSession, booking_id: int) -> Booking | None:
-    result = await db.execute(select(Booking).where(Booking.id == booking_id))
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.review))
+    )
     return result.scalar_one_or_none()
 
 
@@ -20,7 +24,10 @@ async def get_user_bookings(db: AsyncSession, user_id: int, as_owner: bool = Tru
     else:
         condition = Booking.walker_id == user_id
     result = await db.execute(
-        select(Booking).where(condition).order_by(Booking.scheduled_start.desc())
+        select(Booking)
+        .where(condition)
+        .options(selectinload(Booking.review))
+        .order_by(Booking.scheduled_start.desc())
     )
     return list(result.scalars().all())
 

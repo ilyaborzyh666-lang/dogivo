@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.schemas.user import UserOut
+from app.schemas.review import ReviewOut
 
 
 class WalkerProfileUpdate(BaseModel):
@@ -28,6 +29,7 @@ class WalkerProfileOut(BaseModel):
     years_experience: int
     created_at: datetime
     user: UserOut
+    reviews: list[ReviewOut] = []
 
     model_config = {"from_attributes": True}
 

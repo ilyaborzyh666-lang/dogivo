@@ -29,6 +29,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/walker/:id" element={<WalkerProfilePage />} />
         <Route path="/book/:id" element={<BookingPage />} />
+        <Route path="/tracking/:bookingId" element={<TrackingPage />} />
         <Route path="/tracking" element={<TrackingPage />} />
         <Route path="/bookings" element={<BookingsPage />} />
         <Route path="/messages" element={<MessagesPage />} />

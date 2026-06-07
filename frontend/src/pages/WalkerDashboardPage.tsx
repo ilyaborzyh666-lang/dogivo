@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge, Card } from '../components/ui'
 import { api, type Booking, type WalkerProfile } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import { useApp } from '../context/AppContext'
+import { useWebSocket } from '../hooks/useWebSocket'
 
 const statusMap: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'default' }> = {
   pending:     { label: 'ממתין', variant: 'warning' },
@@ -28,6 +29,9 @@ export default function WalkerDashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState(false)
+  const [broadcasting, setBroadcasting] = useState(false)
+  const watchIdRef = useRef<number | null>(null)
+  const { send, connected } = useWebSocket(broadcasting ? backendToken : null)
 
   useEffect(() => {
     if (!backendToken) return
@@ -55,7 +59,28 @@ export default function WalkerDashboardPage() {
     try {
       const updated = await api.updateBookingStatus(bookingId, status)
       setBookings(prev => prev.map(b => b.id === bookingId ? updated : b))
+      if (status === 'completed') stopBroadcast()
     } catch {}
+  }
+
+  function startBroadcast() {
+    if (!navigator.geolocation) return
+    setBroadcasting(true)
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        send({ type: 'location_update', lat: pos.coords.latitude, lon: pos.coords.longitude })
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 5000 },
+    )
+  }
+
+  function stopBroadcast() {
+    setBroadcasting(false)
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
   }
 
   const pending = bookings.filter(b => b.status === 'pending')
@@ -175,7 +200,7 @@ export default function WalkerDashboardPage() {
           <div>
             <h2 className="font-display font-bold text-lg text-gray-900 mb-3">🐾 בטיול עכשיו</h2>
             {active.map(b => (
-              <Card key={b.id} className="bg-brand-50 border-brand-200">
+              <Card key={b.id} className="bg-brand-50 border-brand-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold text-sm text-gray-900">🐕 {b.dog_name}</p>
@@ -188,6 +213,32 @@ export default function WalkerDashboardPage() {
                     סיים טיול
                   </button>
                 </div>
+
+                {/* GPS broadcast toggle */}
+                {!broadcasting ? (
+                  <button
+                    onClick={startBroadcast}
+                    disabled={!navigator.geolocation}
+                    className="w-full bg-green-500 text-white font-bold rounded-2xl py-2.5 text-sm hover:bg-green-600 transition-colors disabled:opacity-40"
+                  >
+                    📍 שתף מיקום בזמן אמת
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 flex-1 bg-green-100 rounded-2xl px-4 py-2.5">
+                      <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-yellow-400'}`} />
+                      <span className="text-xs font-semibold text-green-700">
+                        {connected ? 'משדר מיקום...' : 'מתחבר...'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={stopBroadcast}
+                      className="bg-red-100 text-red-600 font-bold rounded-2xl py-2.5 px-4 text-sm hover:bg-red-200 transition-colors"
+                    >
+                      עצור
+                    </button>
+                  </div>
+                )}
               </Card>
             ))}
           </div>

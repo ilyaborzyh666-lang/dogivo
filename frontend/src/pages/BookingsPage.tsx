@@ -96,7 +96,6 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [reviewBookingId, setReviewBookingId] = useState<number | null>(null)
-  const [reviewed, setReviewed] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (!backendToken) return
@@ -107,7 +106,9 @@ export default function BookingsPage() {
   }, [backendToken])
 
   function handleReviewDone() {
-    if (reviewBookingId) setReviewed(prev => new Set(prev).add(reviewBookingId))
+    if (reviewBookingId) {
+      setBookings(prev => prev.map(b => b.id === reviewBookingId ? { ...b, has_review: true } : b))
+    }
     setReviewBookingId(null)
   }
 
@@ -133,7 +134,7 @@ export default function BookingsPage() {
             const s = statusMap[b.status] ?? { label: b.status, variant: 'default' as const }
             const isActive = b.status === 'in_progress'
             const isUpcoming = b.status === 'pending' || b.status === 'confirmed'
-            const canReview = b.status === 'completed' && !reviewed.has(b.id)
+            const canReview = b.status === 'completed' && !b.has_review
             return (
               <Card
                 key={b.id}
@@ -141,7 +142,7 @@ export default function BookingsPage() {
               >
                 <div
                   className={`flex items-center gap-3 ${isActive ? 'cursor-pointer' : ''}`}
-                  onClick={() => isActive ? navigate('/tracking') : undefined}
+                  onClick={() => isActive ? navigate(`/tracking/${b.id}`) : undefined}
                 >
                   <div className="text-4xl">🐕</div>
                   <div className="flex-1">
@@ -180,7 +181,7 @@ export default function BookingsPage() {
                     ★ השאר ביקורת
                   </button>
                 )}
-                {reviewed.has(b.id) && (
+                {b.has_review && (
                   <p className="mt-3 text-center text-sm text-green-500 font-semibold">✓ הביקורת נשלחה</p>
                 )}
               </Card>

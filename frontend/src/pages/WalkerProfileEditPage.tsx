@@ -20,6 +20,8 @@ export default function WalkerProfileEditPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null)
+  const [locating, setLocating] = useState(false)
 
   useEffect(() => {
     if (!backendToken) return
@@ -31,9 +33,23 @@ export default function WalkerProfileEditPage() {
         setCity(p.city ?? '')
         setExperience(String(p.years_experience))
         setAvailable(p.is_available)
+        if (p.latitude && p.longitude) setCoords({ lat: p.latitude, lon: p.longitude })
       }
     }).finally(() => setLoading(false))
   }, [backendToken])
+
+  function detectLocation() {
+    if (!navigator.geolocation) return
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+        setLocating(false)
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }
 
   async function handleSave() {
     setSaving(true)
@@ -45,6 +61,7 @@ export default function WalkerProfileEditPage() {
         city,
         is_available: available,
         years_experience: Number(experience),
+        ...(coords ? { latitude: coords.lat, longitude: coords.lon } : {}),
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
@@ -171,6 +188,30 @@ export default function WalkerProfileEditPage() {
             rows={3}
             className="w-full px-4 py-2.5 rounded-2xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
           />
+        </Card>
+
+        {/* Location */}
+        <Card>
+          <h2 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-3">מיקום</h2>
+          {coords ? (
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📍</span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-green-700">מיקום רשום</p>
+                <p className="text-xs text-gray-400">{coords.lat.toFixed(4)}, {coords.lon.toFixed(4)}</p>
+              </div>
+              <button onClick={detectLocation} className="text-xs text-brand-500 font-semibold">עדכן</button>
+            </div>
+          ) : (
+            <button
+              onClick={detectLocation}
+              disabled={locating || !navigator.geolocation}
+              className="w-full bg-orange-50 border border-orange-200 text-brand-500 font-bold rounded-2xl py-3 text-sm hover:bg-orange-100 transition-colors disabled:opacity-40"
+            >
+              {locating ? '⏳ מאתר מיקום...' : '📍 קבע מיקום נוכחי'}
+            </button>
+          )}
+          <p className="text-xs text-gray-400 mt-2">המיקום עוזר לבעלי כלבים למצוא אותך בחיפוש</p>
         </Card>
 
         {error && <p className="text-red-500 text-sm text-center bg-red-50 rounded-2xl py-3">{error}</p>}
